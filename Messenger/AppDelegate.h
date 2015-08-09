@@ -1,6 +1,9 @@
 #import <WebKit/WebKit.h>
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, NSUserNotificationCenterDelegate, NSWindowDelegate>
+{
+	IBOutlet NSWindow*            _window;
+}
 
 - (IBAction)checkForUpdates:(id)sender;
 - (void)setActiveConversationAtIndex:(NSString *)index;

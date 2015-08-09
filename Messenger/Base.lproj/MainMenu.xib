@@ -12,7 +12,11 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
+            <connections>
+                <outlet property="_window" destination="Esi-it-Lcn" id="g6V-wy-qf7"/>
+            </connections>
+        </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
@@ -356,6 +360,13 @@
                                     </binding>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="pWb-oD-rDJ"/>
+                            <menuItem title="Enter Full Screen" keyEquivalent="f" id="YQn-UG-nn4">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleFullScreen:" target="-1" id="zJL-Bh-aCW"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -678,5 +689,15 @@
             </menu>
         </menuItem>
         <userDefaultsController representsSharedInstance="YES" id="Ha4-Kh-C6G"/>
+        <window title="Messenger" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" frameAutosaveName="main" animationBehavior="default" id="Esi-it-Lcn">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
+            <windowCollectionBehavior key="collectionBehavior" moveToActiveSpace="YES" fullScreenPrimary="YES"/>
+            <rect key="contentRect" x="803" y="376" width="800" height="600"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <view key="contentView" id="6fh-JW-n7t">
+                <rect key="frame" x="0.0" y="0.0" width="800" height="600"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </view>
+        </window>
     </objects>
 </document>

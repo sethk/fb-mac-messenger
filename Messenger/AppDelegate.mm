@@ -60,7 +60,6 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 
 
 @implementation AppDelegate {
-  NSWindow*            _window;
   WebView*             _webView;
   NSView*              _titlebarView; // NSTitlebarView
   NSString*            _lastNotificationCount;
@@ -78,6 +77,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   // Register ourselves as the default-user-notification center delegate
   [NSUserNotificationCenter defaultUserNotificationCenter].delegate = self;
 
+  #if 0
   // Create main window
   NSUInteger windowStyle = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask;
   if (kCFIsOSX_10_10_orNewer) {
@@ -85,6 +85,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   }
   NSSize frameSize = {800,600};
   _window = [[NSWindow alloc] initWithContentRect:{{0,0},frameSize} styleMask:windowStyle backing:NSBackingStoreBuffered defer:YES];
+  #endif // 0
   if (kCFIsOSX_10_10_orNewer) {
     _window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantLight];
     _window.titleVisibility = NSWindowTitleHidden;
