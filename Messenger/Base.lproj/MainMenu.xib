@@ -356,6 +356,13 @@
                                     </binding>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="C2J-Ox-LdO"/>
+                            <menuItem title="Enter Full Screen" keyEquivalent="f" id="v2e-SO-fvL">
+                                <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleFullScreen:" target="-1" id="Ljr-Tj-mnp"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -384,6 +391,13 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="arrangeInFront:" target="-1" id="DRN-fu-gQh"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="hoC-iI-znf"/>
+                            <menuItem title="Messages" id="XcE-dC-lQL">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="showMainWindow:" target="Voe-Tx-rLC" id="8ZB-6R-ncT"/>
                                 </connections>
                             </menuItem>
                         </items>
