@@ -174,7 +174,9 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   webView.policyDelegate = self;
   webView.frameLoadDelegate = self;
   webView.UIDelegate = self;
-  webView.preferences = wp;
+  if (([NSEvent modifierFlags] & NSShiftKeyMask) != NSShiftKeyMask) {
+    webView.preferences = wp;
+  }
   webView.continuousSpellCheckingEnabled = YES;
   #if USE_BLURRY_BACKGROUND
   webView.drawsBackground = NO;
@@ -645,7 +647,11 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
    ];
   
   // JS injection. Wait for <head> to become available and then add our <script>
-  if (![[NSUserDefaults standardUserDefaults] boolForKey:@"main.js/disable"]) {
+  if (![[NSUserDefaults standardUserDefaults] boolForKey:@"main.js/disable"]
+	  #if DEBUG
+	    && ([NSEvent modifierFlags] & NSAlternateKeyMask) != NSAlternateKeyMask
+	  #endif
+	  ) {
     auto bundleInfo = [NSBundle mainBundle].infoDictionary;
     #if DEBUG
     auto mainJSURLString = @"resource://bundle/main.js";
