@@ -26,6 +26,7 @@
 		3A9A9C841AD5EA13008FABE9 /* JSObjWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A9A9C831AD5EA13008FABE9 /* JSObjWrapper.m */; };
 		3A9A9C861AD5EE4E008FABE9 /* JSNotifications.js.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3A9A9C851AD5EE4E008FABE9 /* JSNotifications.js.mm */; };
 		FC67C6201AD7027700459263 /* FBMApplication.mm in Sources */ = {isa = PBXBuildFile; fileRef = FC67C61F1AD7027700459263 /* FBMApplication.mm */; };
+		FDA206311B7772C20049DA8D /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = FDA206301B7772C20049DA8D /* style.css */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -95,6 +96,7 @@
 		3AEEEB891ADE3B0600F3A659 /* WebPreferencesPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebPreferencesPrivate.h; sourceTree = "<group>"; };
 		FC67C61E1AD7027700459263 /* FBMApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBMApplication.h; sourceTree = "<group>"; };
 		FC67C61F1AD7027700459263 /* FBMApplication.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FBMApplication.mm; sourceTree = "<group>"; };
+		FDA206301B7772C20049DA8D /* style.css */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = text.css; name = style.css; path = website/app/style.css; sourceTree = SOURCE_ROOT; tabWidth = 2; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				3A6757231AE0A52400BDC7C5 /* main.js */,
+				FDA206301B7772C20049DA8D /* style.css */,
 			);
 			name = app;
 			sourceTree = "<group>";
@@ -282,6 +285,7 @@
 			files = (
 				3A9A9C4A1AD5B407008FABE9 /* Images.xcassets in Resources */,
 				3A9A9C4D1AD5B407008FABE9 /* MainMenu.xib in Resources */,
+				FDA206311B7772C20049DA8D /* style.css in Resources */,
 				22C40EB11AD5C5E100FE12C1 /* icon.icns in Resources */,
 				3A6757241AE0A52400BDC7C5 /* main.js in Resources */,
 			);

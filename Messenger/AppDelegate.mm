@@ -10,7 +10,7 @@
 #import "MEmbeddedRes.h"
 
 
-#define USE_BLURRY_BACKGROUND 0
+#define USE_BLURRY_BACKGROUND 1
 
 static BOOL kCFIsOSX_10_10_orNewer;
 
@@ -649,8 +649,10 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
     auto bundleInfo = [NSBundle mainBundle].infoDictionary;
     #if DEBUG
     auto mainJSURLString = @"resource://bundle/main.js";
+    auto mainCSSURLString = @"resource://bundle/style.css";
     #else
     auto mainJSURLString = [NSString stringWithFormat:@"http://fbmacmessenger.rsms.me/app/main.js?v=%@", bundleInfo[@"GitRev"]];
+    #error Need to publish style.css as part of the website.
     #endif
     [webView.mainFrame.windowObject evaluateWebScript:
      [NSString stringWithFormat:@""
@@ -662,6 +664,12 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
       "    script.async = true;"
       "    script.src = '%@';"
       "    (document.head || document.documentElement).appendChild(script);"
+      "    var stylesheet = document.createElement('link');"
+      "    stylesheet.href = '%@';"
+      "    stylesheet.rel = 'stylesheet';"
+      "    if (document.head) {"
+      "      document.head.appendChild(stylesheet);"
+      "    }"
       "    return true;"
       "  }"
       "}"
@@ -674,7 +682,8 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
       "}",
       bundleInfo[@"CFBundleShortVersionString"],
       bundleInfo[@"GitRev"],
-      mainJSURLString]
+      mainJSURLString,
+      mainCSSURLString]
      ];
   }
   
