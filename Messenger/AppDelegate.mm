@@ -62,6 +62,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 @implementation AppDelegate {
   NSWindow*            _window;
   WebView*             _webView;
+  WebView*             _dummyExternalWebView;
   NSView*              _titlebarView; // NSTitlebarView
   NSString*            _lastNotificationCount;
   NSProgressIndicator* _progressBar;
@@ -174,7 +175,21 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   webView.policyDelegate = self;
   webView.frameLoadDelegate = self;
   webView.UIDelegate = self;
+  #if DEBUG
+  if (([NSEvent modifierFlags] & NSShiftKeyMask) != NSShiftKeyMask) {
+    webView.preferences = wp;
+  }
+  #else
   webView.preferences = wp;
+  #endif
+  NSString *webKitVersion = [[NSBundle bundleForClass:[WebView class]]
+                             objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+  NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+  webView.applicationNameForUserAgent = [NSString stringWithFormat:@"fb-mac-messenger/%@, like Safari/%@",
+                                         version, webKitVersion];
+  #if 0
+  webView.customUserAgent = @"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/600.7.12 (KHTML, like Gecko) Version/8.0.7 Safari/600.7.12";
+  #endif // 0
   webView.continuousSpellCheckingEnabled = YES;
   #if USE_BLURRY_BACKGROUND
   webView.drawsBackground = NO;
@@ -354,9 +369,54 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 }
 
 
+- (id)evaluateJavaScript:(NSString *)script
+{
+  WebScriptObject *scriptObject = _webView.windowScriptObject;
+  static NSString * const kErrorPrefix = @"Exception raised during -evaluateWebScript: ";
+  script = [NSString stringWithFormat:
+            @"try { %@ } catch (e) { \"%@\"+e.sourceURL+\":\"+e.line+\": \"+e.toString() }", script, kErrorPrefix];
+  id result = [scriptObject evaluateWebScript:script];
+  if ([result isKindOfClass:[NSString class]] && [result hasPrefix:kErrorPrefix]) {
+    [NSException raise:NSGenericException format:@"%@", result];
+  }
+  return result;
+}
+
+
 - (void)setActiveConversationAtIndex:(NSString*)index {
-  [_webView.windowScriptObject evaluateWebScript:
-   [NSString stringWithFormat:@"MacMessenger.selectConversationAtIndex(%@)", index]];
+  [self evaluateJavaScript:[NSString stringWithFormat:@"MacMessenger.selectConversationAtIndex(%@)", index]];
+}
+
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
+  SEL action = [menuItem action];
+  if (action == @selector(selectNewerConversation:)) {
+    return [self canSelectNewerConversation];
+  } else if (action == @selector(selectOlderConversation:)) {
+    return [self canSelectOlderConversation];
+  } else {
+    return YES;
+  }
+}
+
+
+- (BOOL)canSelectNewerConversation {
+  return [[self evaluateJavaScript:@"MacMessenger.canSelectNewerConversation()"] boolValue];
+}
+
+
+- (IBAction)selectNewerConversation:(id)sender {
+  [self evaluateJavaScript:@"MacMessenger.selectNewerConversation()"];
+}
+
+
+- (BOOL)canSelectOlderConversation {
+  return [[self evaluateJavaScript:@"MacMessenger.canSelectOlderConversation()"] boolValue];
+}
+
+
+- (IBAction)selectOlderConversation:(id)sender {
+  [self evaluateJavaScript:@"MacMessenger.selectOlderConversation()"];
 }
 
 
@@ -376,12 +436,12 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 
 - (IBAction)find:(id)sender {
   // Give input focus to the search field
-  [_webView.windowScriptObject evaluateWebScript:@"MacMessenger.focusSearchField()"];
+  [self evaluateJavaScript:@"MacMessenger.focusSearchField()"];
 }
 
 
 - (IBAction)composeNewMessage:(id)sender {
-  [_webView.mainFrame.windowObject evaluateWebScript:@"MacMessenger.composeNewMessage()"];
+  [self evaluateJavaScript:@"MacMessenger.composeNewMessage()"];
 }
 
 
@@ -391,7 +451,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 
 
 - (IBAction)showPreferences:(id)sender {
-  [_webView.mainFrame.windowObject evaluateWebScript:@"MacMessenger.showSettings()"];
+  [self evaluateJavaScript:@"MacMessenger.showSettings()"];
 }
 
 
@@ -404,7 +464,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 }
 
 - (IBAction)logOut:(id)sender {
-  [_webView.mainFrame.windowObject evaluateWebScript:@"MacMessenger.logOut()"];
+  [self evaluateJavaScript:@"MacMessenger.logOut()"];
 }
 
 - (IBAction)showTerms:(id)sender {
@@ -415,6 +475,9 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   [self showWebViewWindowWithID:@"privacy-policy" title:@"Messenger Privacy Policy" URL:@"https://www.facebook.com/help/cookies"];
 }
 
+- (IBAction)showMainWindow:(id)sender {
+  [_window makeKeyAndOrderFront:sender];
+}
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
   [_window makeKeyAndOrderFront:self];
@@ -514,14 +577,13 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 - (BOOL)canMakeTextStandardSize { return _webView.canMakeTextStandardSize; }
 - (IBAction)makeTextStandardSize:(id)sender { [_webView makeTextStandardSize:sender]; }
 
-
 #pragma mark - NSWindowDelegate
 
 
 - (void)windowDidBecomeKey:(NSNotification*)notification {
   //NSLog(@"%@%@%@", self, NSStringFromSelector(_cmd), notification);
   // Give focus to the composer
-  [_webView.windowScriptObject evaluateWebScript:@"MacMessenger.focusComposer()"];
+  [self evaluateJavaScript:@"(typeof MacMessenger != 'undefined') && MacMessenger.focusComposer()"];
 }
 
 
@@ -602,6 +664,16 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
 }
 
 
+- (WebView *)webView:(WebView *)sender createWebViewWithRequest:(NSURLRequest *)request {
+  // When window.open() is used, request will be nil, so we have to create a dummy WebView and wait for the policy
+  // delegate call:
+  if (!_dummyExternalWebView) {
+    _dummyExternalWebView = [WebView new];
+    [_dummyExternalWebView setPolicyDelegate:self];
+  }
+  return _dummyExternalWebView;
+}
+
 
 #pragma mark - WebFrameLoadDelegate
 
@@ -645,7 +717,11 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
    ];
   
   // JS injection. Wait for <head> to become available and then add our <script>
-  if (![[NSUserDefaults standardUserDefaults] boolForKey:@"main.js/disable"]) {
+  if (![[NSUserDefaults standardUserDefaults] boolForKey:@"main.js/disable"]
+	  #if DEBUG
+	    && ([NSEvent modifierFlags] & NSAlternateKeyMask) != NSAlternateKeyMask
+	  #endif
+	  ) {
     auto bundleInfo = [NSBundle mainBundle].infoDictionary;
     #if DEBUG
     auto mainJSURLString = @"resource://bundle/main.js";
@@ -792,6 +868,13 @@ decidePolicyForNavigationAction:(NSDictionary *)actionInformation
 decisionListener:(id<WebPolicyDecisionListener>)listener
 {
   //NSLog(@"%@%@ actionInformation=%@ request=%@", self, NSStringFromSelector(_cmd), actionInformation, request);
+#if DEBUG
+  static BOOL sAlreadyReported = NO;
+  if (!sAlreadyReported) {
+    NSLog(@"My user agent is %@", [request valueForHTTPHeaderField:@"User-Agent"]);
+    sAlreadyReported = YES;
+  }
+#endif // DEBUG
   NSURL* url = [[actionInformation objectForKey:WebActionOriginalURLKey] absoluteURL];
   if ([url.scheme isEqualToString:@"about"]) {
     [listener ignore];
