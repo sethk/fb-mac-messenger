@@ -174,9 +174,13 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   webView.policyDelegate = self;
   webView.frameLoadDelegate = self;
   webView.UIDelegate = self;
+  #if DEBUG
   if (([NSEvent modifierFlags] & NSShiftKeyMask) != NSShiftKeyMask) {
     webView.preferences = wp;
   }
+  #else
+  webView.preferences = wp;
+  #endif
   webView.continuousSpellCheckingEnabled = YES;
   #if USE_BLURRY_BACKGROUND
   webView.drawsBackground = NO;
